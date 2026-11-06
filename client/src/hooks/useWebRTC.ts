@@ -2,6 +2,24 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { WebRTCConnectionState } from '../types/index.js';
 
+// Optimize SDP for high-clarity mono speech with hardware echo cancellation
+function optimizeVoiceSdp(sdp?: string): string | undefined {
+  if (!sdp) return sdp;
+  return sdp.replace(/a=fmtp:(\d+) (.*)/g, (match, pt, params) => {
+    if (sdp.includes(`a=rtpmap:${pt} opus/48000`)) {
+      let updatedParams = params;
+      if (!updatedParams.includes('stereo=')) {
+        updatedParams += ';stereo=0;sprop-stereo=0';
+      }
+      if (!updatedParams.includes('useinbandfec=')) {
+        updatedParams += ';useinbandfec=1';
+      }
+      return `a=fmtp:${pt} ${updatedParams}`;
+    }
+    return match;
+  });
+}
+
 interface UseWebRTCOptions {
   socket: Socket | null;
   roomId: string;
@@ -69,7 +87,15 @@ export function useWebRTC({
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-        },
+          channelCount: 1, // Mono channel to eliminate stereo crosstalk & feedback
+          sampleRate: 48000,
+          // Advanced Chromium/Webkit acoustic processing:
+          googEchoCancellation: true,
+          googAutoGainControl: true,
+          googNoiseSuppression: true,
+          googHighpassFilter: true,
+          googTypingNoiseDetection: true,
+        } as any,
       });
 
       console.log('[WebRTC] Local media stream acquired:', stream.id);
@@ -215,6 +241,9 @@ export function useWebRTC({
         offerToReceiveAudio: true,
         offerToReceiveVideo: true,
       });
+      if (offer.sdp) {
+        offer.sdp = optimizeVoiceSdp(offer.sdp);
+      }
       await pc.setLocalDescription(offer);
 
       socket.emit('webrtc:offer', {
@@ -347,6 +376,9 @@ export function useWebRTC({
         }
 
         const answer = await pc.createAnswer();
+        if (answer.sdp) {
+          answer.sdp = optimizeVoiceSdp(answer.sdp);
+        }
         await pc.setLocalDescription(answer);
 
         socket.emit('webrtc:answer', {

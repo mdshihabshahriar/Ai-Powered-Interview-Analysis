@@ -81,8 +81,8 @@ export const CandidateInterviewPage: React.FC<CandidateInterviewPageProps> = ({
       />
 
       {/* Main Video-Only Stage (Large Full-Width Experience) */}
-      <main className="flex-1 p-4 sm:p-6 max-w-6xl mx-auto w-full flex flex-col justify-center items-center">
-        <div className="relative w-full h-[65vh] sm:h-[72vh] rounded-3xl overflow-hidden bg-surface-900 border border-surface-800/90 shadow-2xl flex items-center justify-center">
+      <main className="flex-1 p-3 sm:p-6 max-w-6xl mx-auto w-full flex flex-col justify-center items-center">
+        <div className="relative w-full h-[52vh] sm:h-[65vh] md:h-[72vh] max-h-[680px] rounded-2xl sm:rounded-3xl overflow-hidden bg-surface-900 border border-surface-800/90 shadow-2xl flex items-center justify-center">
           {/* Interviewer Live Video (Large Primary) */}
           <VideoPlayer
             stream={remoteStream}
@@ -94,7 +94,7 @@ export const CandidateInterviewPage: React.FC<CandidateInterviewPageProps> = ({
           />
 
           {/* Candidate Self View (Floating Picture-in-Picture in Corner) */}
-          <div className="absolute top-4 right-4 w-36 h-28 sm:w-56 sm:h-40 z-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-surface-700/80 hover:scale-105 transition-transform">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-28 h-20 sm:w-44 sm:h-32 md:w-56 md:h-40 z-20 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-surface-700/80 hover:scale-105 transition-transform">
             <VideoPlayer
               stream={localStream}
               name={candidateName}
@@ -109,7 +109,7 @@ export const CandidateInterviewPage: React.FC<CandidateInterviewPageProps> = ({
         </div>
 
         {/* Video Controls: Mute/Unmute Mic, Video On/Off, Leave */}
-        <div className="mt-5 w-full flex justify-center">
+        <div className="mt-3 sm:mt-5 w-full flex justify-center">
           <VideoControls
             isMuted={isAudioMuted}
             isVideoOff={isVideoOff}

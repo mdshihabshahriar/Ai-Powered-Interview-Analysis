@@ -32,23 +32,23 @@ export const InterviewerLobbyPage: React.FC<InterviewerLobbyPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-6">
-      <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center items-center">
+    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-4 sm:p-6">
+      <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center items-center py-6 sm:py-8">
         {/* Header Badge */}
-        <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold mb-6">
+        <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold mb-4 sm:mb-6">
           <Shield className="w-3.5 h-3.5 text-amber-400" />
           <span>Interviewer Lobby & Room Management</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-white text-center tracking-tight mb-2">
           Interview Room Ready
         </h1>
-        <p className="text-sm text-slate-400 text-center max-w-lg mb-8">
+        <p className="text-xs sm:text-sm text-slate-400 text-center max-w-lg mb-6 sm:mb-8">
           Share your room code with the candidate. Once they join, click "Start Interview" to begin the live call.
         </p>
 
         {/* Room Code Card */}
-        <div className="w-full max-w-md bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-2xl space-y-5 text-center mb-8">
+        <div className="w-full max-w-md bg-surface-900 border border-surface-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-center mb-6 sm:mb-8">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
             Unique Room Code
           </span>

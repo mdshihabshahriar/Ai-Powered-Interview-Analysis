@@ -88,10 +88,10 @@ export const InterviewerDashboard: React.FC<InterviewerDashboardProps> = ({
       />
 
       {/* Main Workstation */}
-      <main className="flex-1 p-4 sm:p-6 max-w-[1700px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <main className="flex-1 p-3 sm:p-6 max-w-[1700px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         {/* Left Column: Video Interface & Asked Question History (7 Cols - Sticky on Desktop) */}
         <section className="lg:col-span-7 flex flex-col space-y-4 lg:sticky lg:top-20 self-start">
-          <div className="relative flex-1 min-h-[380px] sm:min-h-[460px] rounded-3xl overflow-hidden bg-surface-900 border border-surface-800/90 shadow-2xl flex items-center justify-center">
+          <div className="relative flex-1 min-h-[250px] sm:min-h-[380px] md:min-h-[460px] rounded-2xl sm:rounded-3xl overflow-hidden bg-surface-900 border border-surface-800/90 shadow-2xl flex items-center justify-center">
             {/* Candidate Video (Large Primary) */}
             <VideoPlayer
               stream={remoteStream}
@@ -104,7 +104,7 @@ export const InterviewerDashboard: React.FC<InterviewerDashboardProps> = ({
             />
 
             {/* Interviewer Self View (Floating PiP in Corner) */}
-            <div className="absolute top-4 right-4 w-32 h-24 sm:w-48 sm:h-36 z-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-surface-700/80 hover:scale-105 transition-transform">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-24 h-18 sm:w-36 sm:h-28 md:w-48 md:h-36 z-20 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-surface-700/80 hover:scale-105 transition-transform">
               <VideoPlayer
                 stream={localStream}
                 name={interviewerName}

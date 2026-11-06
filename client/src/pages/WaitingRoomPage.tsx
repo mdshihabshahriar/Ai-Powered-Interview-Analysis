@@ -15,24 +15,24 @@ export const WaitingRoomPage: React.FC<WaitingRoomPageProps> = ({
   onLeave,
 }) => {
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-6">
-      <div className="max-w-xl mx-auto w-full flex-1 flex flex-col justify-center items-center text-center">
+    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-4 sm:p-6">
+      <div className="max-w-xl mx-auto w-full flex-1 flex flex-col justify-center items-center text-center py-6 sm:py-8">
         {/* Pulsing waiting badge */}
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-xs font-semibold text-brand-300 mb-6 animate-pulse">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-xs font-semibold text-brand-300 mb-4 sm:mb-6 animate-pulse">
           <Clock className="w-3.5 h-3.5 text-brand-400" />
           <span>Connected to Waiting Room</span>
         </div>
 
-        <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
           Waiting for Interviewer to Begin
         </h1>
-        <p className="text-sm text-slate-400 max-w-md mb-8">
+        <p className="text-xs sm:text-sm text-slate-400 max-w-md mb-6 sm:mb-8">
           You are successfully connected to room <span className="font-mono text-brand-300 font-bold">{roomId}</span>.
           The video call will start as soon as the interviewer activates it.
         </p>
 
         {/* Standby Card (Camera Off Before Call) */}
-        <div className="w-full bg-surface-900 border border-surface-800 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div className="w-full bg-surface-900 border border-surface-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4">
           <div className="flex items-center justify-between text-xs text-slate-400 px-1">
             <span className="flex items-center space-x-1.5 font-medium">
               <User className="w-3.5 h-3.5 text-brand-400" />

@@ -9,6 +9,38 @@ interface UseSpeechRecognitionOptions {
   lang?: string;
 }
 
+// Remove acoustic stutter and repeated echo words (e.g. "hello hello hello" -> "hello")
+function deduplicateRepeatedWords(text: string): string {
+  if (!text) return '';
+  const words = text.trim().split(/\s+/);
+  const result: string[] = [];
+
+  for (let i = 0; i < words.length; i++) {
+    const current = words[i];
+    const prev = result[result.length - 1];
+
+    // Single-word consecutive duplicate: "hello hello" -> "hello"
+    if (prev && current.toLowerCase() === prev.toLowerCase()) {
+      continue;
+    }
+
+    // Two-word phrase consecutive duplicate: "in my in my" -> "in my"
+    if (
+      result.length >= 2 &&
+      i + 1 < words.length &&
+      words[i].toLowerCase() === result[result.length - 2].toLowerCase() &&
+      words[i + 1].toLowerCase() === result[result.length - 1].toLowerCase()
+    ) {
+      i++; // skip 2nd word of repeat
+      continue;
+    }
+
+    result.push(current);
+  }
+
+  return result.join(' ');
+}
+
 export function useSpeechRecognition({
   socket,
   roomId,
@@ -25,15 +57,37 @@ export function useSpeechRecognition({
   const recognitionRef = useRef<any>(null);
   const isManuallyStoppedRef = useRef<boolean>(false);
   const silenceTimerRef = useRef<any>(null);
-  const lastFinalTranscriptRef = useRef<string>('');
+  const restartTimerRef = useRef<any>(null);
+  const isRunningRef = useRef<boolean>(false);
   const latestFullTextRef = useRef<string>('');
 
-  // Helper to cleanup recognition safely
+  // Keep latest callbacks in refs to prevent rebuilding recognition on parent re-renders
+  const onFinalAnswerRef = useRef(onFinalAnswer);
+  useEffect(() => {
+    onFinalAnswerRef.current = onFinalAnswer;
+  }, [onFinalAnswer]);
+
+  const socketRef = useRef(socket);
+  useEffect(() => {
+    socketRef.current = socket;
+  }, [socket]);
+
+  const roomIdRef = useRef(roomId);
+  useEffect(() => {
+    roomIdRef.current = roomId;
+  }, [roomId]);
+
+  // Cleanup helper
   const cleanupRecognition = useCallback(() => {
     if (silenceTimerRef.current) {
       clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = null;
     }
+    if (restartTimerRef.current) {
+      clearTimeout(restartTimerRef.current);
+      restartTimerRef.current = null;
+    }
+    isRunningRef.current = false;
     if (recognitionRef.current) {
       try {
         recognitionRef.current.onstart = null;
@@ -47,7 +101,7 @@ export function useSpeechRecognition({
     setIsListening(false);
   }, []);
 
-  // Initialize Speech Recognition ONLY when isActive is true
+  // Main lifecycle effect: ONLY depends on isActive and lang
   useEffect(() => {
     const SpeechRecognitionAPI =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -58,15 +112,13 @@ export function useSpeechRecognition({
     }
 
     if (!isActive) {
-      // If not active (e.g. muted or out of call), completely stop recognition and clear stream
       cleanupRecognition();
       setFinalText('');
       setInterimText('');
       latestFullTextRef.current = '';
-      lastFinalTranscriptRef.current = '';
-      if (socket && roomId) {
-        socket.emit('candidate:speech-transcript', {
-          roomId,
+      if (socketRef.current && roomIdRef.current) {
+        socketRef.current.emit('candidate:speech-transcript', {
+          roomId: roomIdRef.current,
           text: '',
           isFinal: false,
         });
@@ -74,95 +126,108 @@ export function useSpeechRecognition({
       return;
     }
 
-    // Active: Initialize fresh recognition instance
-    try {
-      const recognition = new SpeechRecognitionAPI();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = lang;
-      recognition.maxAlternatives = 1;
-      isManuallyStoppedRef.current = false;
+    isManuallyStoppedRef.current = false;
 
-      recognition.onstart = () => {
-        setIsListening(true);
-        setSpeechError(null);
-      };
+    const startRecognitionInstance = () => {
+      if (isManuallyStoppedRef.current || !isActive || isRunningRef.current) return;
 
-      recognition.onresult = (event: any) => {
-        let accumulatedFinal = '';
-        let accumulatedInterim = '';
+      try {
+        const recognition = new SpeechRecognitionAPI();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = lang;
+        recognition.maxAlternatives = 1;
 
-        // Iterate through all results in the current session (prevents duplicates)
-        for (let i = 0; i < event.results.length; i++) {
-          const res = event.results[i];
-          const chunk = res[0]?.transcript || '';
-          if (res.isFinal) {
-            accumulatedFinal += (accumulatedFinal ? ' ' : '') + chunk.trim();
-          } else {
-            accumulatedInterim += (accumulatedInterim ? ' ' : '') + chunk.trim();
-          }
-        }
+        recognition.onstart = () => {
+          isRunningRef.current = true;
+          setIsListening(true);
+          setSpeechError(null);
+        };
 
-        const cleanFinal = accumulatedFinal.trim();
-        const cleanInterim = accumulatedInterim.trim();
+        recognition.onresult = (event: any) => {
+          let accumulatedFinal = '';
+          let accumulatedInterim = '';
 
-        setFinalText(cleanFinal);
-        setInterimText(cleanInterim);
-
-        const fullCombined = (cleanFinal + (cleanInterim ? ' ' + cleanInterim : '')).trim();
-        latestFullTextRef.current = fullCombined;
-
-        // Stream real-time transcript to interviewer via socket
-        if (socket && roomId && fullCombined) {
-          socket.emit('candidate:speech-transcript', {
-            roomId,
-            text: fullCombined,
-            isFinal: false,
-          });
-        }
-
-        // Silence / completion detection:
-        // When speech is detected and candidate pauses for 2.2 seconds, trigger auto-submission
-        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-        if (fullCombined.length > 5) {
-          silenceTimerRef.current = setTimeout(() => {
-            if (onFinalAnswer && fullCombined) {
-              onFinalAnswer(fullCombined);
+          for (let i = 0; i < event.results.length; i++) {
+            const res = event.results[i];
+            const chunk = res[0]?.transcript || '';
+            if (res.isFinal) {
+              accumulatedFinal += (accumulatedFinal ? ' ' : '') + chunk.trim();
+            } else {
+              accumulatedInterim += (accumulatedInterim ? ' ' : '') + chunk.trim();
             }
-          }, 2200);
-        }
-      };
+          }
 
-      recognition.onerror = (event: any) => {
-        if (event.error === 'not-allowed') {
-          setSpeechError('Microphone permission denied for speech recognition.');
-        } else if (event.error !== 'no-speech') {
-          console.warn('[Speech] Error:', event.error);
-        }
-      };
+          const cleanFinal = deduplicateRepeatedWords(accumulatedFinal);
+          const cleanInterim = deduplicateRepeatedWords(accumulatedInterim);
 
-      recognition.onend = () => {
-        // Auto-restart only if isActive is still true and not manually stopped
-        if (!isManuallyStoppedRef.current && isActive) {
-          try {
-            recognition.start();
-          } catch (e) {}
-        } else {
+          setFinalText(cleanFinal);
+          setInterimText(cleanInterim);
+
+          const fullCombined = deduplicateRepeatedWords(
+            (cleanFinal + (cleanInterim ? ' ' + cleanInterim : '')).trim()
+          );
+          latestFullTextRef.current = fullCombined;
+
+          // Stream real-time transcript to interviewer via socket
+          if (socketRef.current && roomIdRef.current && fullCombined) {
+            socketRef.current.emit('candidate:speech-transcript', {
+              roomId: roomIdRef.current,
+              text: fullCombined,
+              isFinal: false,
+            });
+          }
+
+          // Silence / completion detection: after 2.5s of silence, auto-submit answer
+          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+          if (fullCombined.length > 5) {
+            silenceTimerRef.current = setTimeout(() => {
+              if (onFinalAnswerRef.current && fullCombined) {
+                onFinalAnswerRef.current(fullCombined);
+              }
+            }, 2500);
+          }
+        };
+
+        recognition.onerror = (event: any) => {
+          if (event.error === 'not-allowed') {
+            setSpeechError('Microphone permission denied for speech recognition.');
+            isManuallyStoppedRef.current = true;
+          } else if (event.error === 'service-not-allowed') {
+            setSpeechError('Speech recognition service not allowed on this browser.');
+            isManuallyStoppedRef.current = true;
+          } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+            console.warn('[Speech] Recognition event error:', event.error);
+          }
+        };
+
+        recognition.onend = () => {
+          isRunningRef.current = false;
           setIsListening(false);
-        }
-      };
 
-      recognitionRef.current = recognition;
-      recognition.start();
-    } catch (err: any) {
-      console.warn('[Speech] Initialization error:', err);
-      setIsSupported(false);
-    }
+          // Gently restart recognition with a 500ms delay to avoid rapid chimes/beeps
+          if (!isManuallyStoppedRef.current && isActive) {
+            if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
+            restartTimerRef.current = setTimeout(() => {
+              startRecognitionInstance();
+            }, 500);
+          }
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+      } catch (err: any) {
+        console.warn('[Speech] Failed to start recognition instance:', err);
+        isRunningRef.current = false;
+      }
+    };
+
+    startRecognitionInstance();
 
     return () => {
       cleanupRecognition();
     };
-  }, [isActive, lang, socket, roomId, onFinalAnswer, cleanupRecognition]);
+  }, [isActive, lang, cleanupRecognition]);
 
   const stopListening = useCallback(() => {
     isManuallyStoppedRef.current = true;
@@ -173,7 +238,6 @@ export function useSpeechRecognition({
     setFinalText('');
     setInterimText('');
     latestFullTextRef.current = '';
-    lastFinalTranscriptRef.current = '';
     if (silenceTimerRef.current) {
       clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = null;

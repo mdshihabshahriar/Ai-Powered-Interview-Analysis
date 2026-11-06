@@ -94,10 +94,10 @@ export const ResultDashboard: React.FC<ResultDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface-950 p-6 sm:p-10 flex flex-col justify-between">
-      <div className="max-w-6xl mx-auto w-full space-y-8 flex-1">
+    <div className="min-h-screen bg-surface-950 p-4 sm:p-6 md:p-10 flex flex-col justify-between">
+      <div className="max-w-6xl mx-auto w-full space-y-6 sm:space-y-8 flex-1">
         {/* Top Header Card */}
-        <div className="bg-gradient-to-r from-surface-900 via-surface-850 to-surface-900 border border-surface-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-gradient-to-r from-surface-900 via-surface-850 to-surface-900 border border-surface-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center space-x-2 text-xs font-semibold text-brand-400 uppercase tracking-wider mb-2">
               <Award className="w-4 h-4" />

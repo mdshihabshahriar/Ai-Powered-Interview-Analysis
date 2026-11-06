@@ -26,13 +26,38 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Enforce zero audio output on local stream to prevent acoustic feedback loop
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    if (isLocal) {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+    } else {
+      video.muted = Boolean(isMuted);
+    }
+  }, [isLocal, isMuted]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isLocal) {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
+    }
+
     if (stream) {
       if (video.srcObject !== stream) {
         video.srcObject = stream;
+      }
+      if (isLocal) {
+        video.muted = true;
+        video.defaultMuted = true;
+        video.volume = 0;
       }
       const playPromise = video.play();
       if (playPromise !== undefined) {
@@ -43,7 +68,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     } else {
       video.srcObject = null;
     }
-  }, [stream]);
+  }, [stream, isLocal]);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
@@ -79,9 +104,24 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         ref={videoRef}
         autoPlay
         playsInline
-        muted={isLocal} // CRITICAL: Local stream must be muted to prevent feedback loop!
+        muted={isLocal || isMuted}
         onLoadedMetadata={(e) => {
-          (e.target as HTMLVideoElement).play().catch(() => {});
+          const v = e.target as HTMLVideoElement;
+          if (isLocal) {
+            v.muted = true;
+            v.defaultMuted = true;
+            v.volume = 0;
+          }
+          v.play().catch(() => {});
+        }}
+        onVolumeChange={(e) => {
+          if (isLocal) {
+            const v = e.target as HTMLVideoElement;
+            if (!v.muted || v.volume > 0) {
+              v.muted = true;
+              v.volume = 0;
+            }
+          }
         }}
         className={`w-full h-full object-cover transition-opacity duration-300 ${
           isLocal ? 'mirror-video' : ''

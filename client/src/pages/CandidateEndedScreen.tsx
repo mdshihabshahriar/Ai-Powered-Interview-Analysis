@@ -13,8 +13,8 @@ export const CandidateEndedScreen: React.FC<CandidateEndedScreenProps> = ({
   onExit,
 }) => {
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col justify-center items-center p-6 text-center">
-      <div className="max-w-lg w-full bg-surface-900 border border-surface-800 rounded-3xl p-8 shadow-2xl space-y-6">
+    <div className="min-h-screen bg-surface-950 flex flex-col justify-center items-center p-4 sm:p-6 text-center">
+      <div className="max-w-lg w-full bg-surface-900 border border-surface-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 sm:space-y-6">
         {/* Success Icon */}
         <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
           <CheckCircle2 className="w-8 h-8" />

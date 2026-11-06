@@ -56,19 +56,19 @@ export const CandidateJoinPage: React.FC<CandidateJoinPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-6">
-      <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center">
+    <div className="min-h-screen bg-surface-950 flex flex-col justify-between p-4 sm:p-6">
+      <div className="max-w-md mx-auto w-full flex-1 flex flex-col justify-center py-6 sm:py-8">
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="self-start mb-6 text-xs text-slate-400 hover:text-white flex items-center space-x-1.5 transition-colors"
+          className="self-start mb-4 sm:mb-6 text-xs text-slate-400 hover:text-white flex items-center space-x-1.5 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
         </button>
 
         {/* Card */}
-        <div className="bg-surface-900 border border-surface-800 rounded-3xl p-8 shadow-2xl space-y-6">
+        <div className="bg-surface-900 border border-surface-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 sm:space-y-6">
           <div className="text-center">
             <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-4">
               <User className="w-6 h-6" />

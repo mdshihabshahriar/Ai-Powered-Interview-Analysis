@@ -15,16 +15,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="min-h-screen bg-surface-950 flex flex-col justify-between">
       {/* Top Header */}
-      <header className="px-6 py-5 max-w-7xl mx-auto w-full flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-black text-xl">
+      <header className="px-4 sm:px-6 py-4 sm:py-5 max-w-7xl mx-auto w-full flex items-center justify-between">
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-black text-lg sm:text-xl shrink-0">
             AI
           </div>
-          <div>
-            <span className="font-extrabold text-xl tracking-tight text-white">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
               EvalVue AI
             </span>
-            <span className="text-[11px] font-semibold text-brand-400 ml-2 px-2 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/20">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-brand-400 px-2 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/20 whitespace-nowrap">
               Real-Time Interview System
             </span>
           </div>
@@ -32,30 +32,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center items-center text-center">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 flex flex-col justify-center items-center text-center">
         {/* Modern Pill Badge */}
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-surface-800/80 border border-surface-700/60 text-xs font-medium text-brand-300 mb-8 shadow-xl">
-          <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-          <span>WebRTC Video • Speech Recognition • AI Semantic Evaluation</span>
+        <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-surface-800/80 border border-surface-700/60 text-xs font-medium text-brand-300 mb-6 sm:mb-8 shadow-xl max-w-full truncate">
+          <Sparkles className="w-3.5 h-3.5 text-brand-400 shrink-0" />
+          <span className="truncate">WebRTC Video • Speech Recognition • AI Evaluation</span>
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl">
           Real-Time AI Online Interview &{' '}
           <span className="bg-gradient-to-r from-brand-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
             Automated Evaluation
           </span>
         </h1>
 
-        <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
+        <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl leading-relaxed">
           Conduct live peer-to-peer technical interviews with instant candidate speech-to-text transcription,
           semantic answer evaluation against predefined technical questions, and comprehensive CSV reporting.
         </p>
 
         {/* Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 w-full max-w-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-8 sm:mt-12 w-full max-w-3xl">
           {/* Card 1: Interviewer */}
-          <div className="group relative rounded-3xl bg-gradient-to-b from-surface-900 to-surface-950 border border-surface-800/90 p-8 text-left hover:border-brand-500/50 transition-all duration-300 shadow-2xl hover:shadow-brand-500/10 flex flex-col justify-between">
+          <div className="group relative rounded-2xl sm:rounded-3xl bg-gradient-to-b from-surface-900 to-surface-950 border border-surface-800/90 p-5 sm:p-8 text-left hover:border-brand-500/50 transition-all duration-300 shadow-2xl hover:shadow-brand-500/10 flex flex-col justify-between">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Shield className="w-6 h-6" />
@@ -95,7 +95,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 2: Candidate */}
-          <div className="group relative rounded-3xl bg-gradient-to-b from-surface-900 to-surface-950 border border-surface-800/90 p-8 text-left hover:border-indigo-500/50 transition-all duration-300 shadow-2xl hover:shadow-indigo-500/10 flex flex-col justify-between">
+          <div className="group relative rounded-2xl sm:rounded-3xl bg-gradient-to-b from-surface-900 to-surface-950 border border-surface-800/90 p-5 sm:p-8 text-left hover:border-indigo-500/50 transition-all duration-300 shadow-2xl hover:shadow-indigo-500/10 flex flex-col justify-between">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <User className="w-6 h-6" />
