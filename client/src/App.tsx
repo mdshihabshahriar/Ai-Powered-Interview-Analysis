@@ -16,6 +16,7 @@ import {
   Participant,
   InterviewSummary,
 } from './types/index.js';
+import { getApiUrl } from './utils/api.js';
 
 type PageState =
   | 'landing'
@@ -317,7 +318,7 @@ export function App() {
   const handleJoinAsInterviewer = async () => {
     setIsCreatingRoom(true);
     try {
-      const res = await fetch('/api/rooms', {
+      const res = await fetch(getApiUrl('/api/rooms'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ interviewerName: 'Interviewer' }),

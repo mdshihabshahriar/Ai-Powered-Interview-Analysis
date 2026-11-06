@@ -225,6 +225,7 @@ class RoomManager {
             endedAt: room.endedAt,
             status: room.status,
             interviewerName: room.interviewer?.name || null,
+            interviewerSocketId: room.interviewer?.socketId || null,
             candidateName: room.candidate?.name || null,
         };
     }

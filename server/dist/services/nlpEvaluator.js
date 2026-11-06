@@ -8,6 +8,7 @@ const GREETING_PATTERNS = [
     /\b(hi|hello|hey)\b/i,
     /\bgood (morning|afternoon|evening|day)\b/i,
     /\bhow are you\b/i,
+    /\bhow are you doing\b/i,
     /\bnice to meet you\b/i,
     /\bglad to meet you\b/i,
     /\bcan you hear me\b/i,
@@ -75,7 +76,6 @@ function normalizeWord(word) {
     let w = word.toLowerCase();
     if (TECH_SYNONYMS[w])
         return TECH_SYNONYMS[w];
-    // Simple stemming for plurals and common suffixes
     if (w.endsWith('ies'))
         w = w.slice(0, -3) + 'y';
     else if (w.endsWith('es') && w.length > 4)
@@ -121,6 +121,56 @@ export function isGreeting(text) {
         }
     }
     return false;
+}
+/**
+ * Filter greetings and casual conversational segments at the beginning or edges of responses
+ * while preserving genuine technical answer content.
+ *
+ * E.g.: "Hello, I am fine. JavaScript is a programming language used to make websites interactive."
+ * -> returns cleanedAnswer: "JavaScript is a programming language used to make websites interactive."
+ */
+export function filterGreetingsAndConversation(rawAnswer) {
+    if (!rawAnswer || !rawAnswer.trim()) {
+        return { cleanedAnswer: '', isPureGreeting: false };
+    }
+    let text = rawAnswer.trim();
+    // Pattern matching conversational openings / pleasantries
+    const PREAMBLE_PATTERNS = [
+        /^(?:hello|hi|hey|good\s+(?:morning|afternoon|evening|day))[,\s!.-]*/i,
+        /^(?:how\s+are\s+you(?:\s+doing)?|how('?s|\s+is)\s+it\s+going)[,\s!.-]*/i,
+        /^(?:i('?m|\s+am)\s+(?:fine|good|doing\s+well|great))[,\s!.-]*/i,
+        /^(?:thank\s+you|thanks(?:\s+for\s+the\s+question|\s+a\s+lot)?)[,\s!.-]*/i,
+        /^(?:nice\s+to\s+meet\s+you|glad\s+to\s+be\s+here)[,\s!.-]*/i,
+        /^(?:yes|yeah|yep|can\s+you\s+hear\s+me|am\s+i\s+audible|i\s+can\s+hear\s+you)[,\s!.-]*/i,
+        /^(?:sure|okay|ok|well|so|alright|basically)[,\s!.-]*/i,
+        /^(?:to\s+answer\s+your\s+question|as\s+for\s+your\s+question)[,\s!.-]*/i,
+    ];
+    let modified = true;
+    while (modified && text.length > 0) {
+        modified = false;
+        for (const pattern of PREAMBLE_PATTERNS) {
+            if (pattern.test(text)) {
+                const next = text.replace(pattern, '').trim();
+                if (next !== text) {
+                    text = next;
+                    modified = true;
+                }
+            }
+        }
+    }
+    // Remove trailing pleasantries like "thank you very much"
+    text = text.replace(/\s*(?:thank\s+you(?:\s+very\s+much)?|thanks(?:\s+a\s+lot)?|that('?s|\s+is)\s+all(?:,\s*thanks)?)[.!]?\s*$/i, '').trim();
+    // If after stripping greetings nothing or very few words remain
+    if (!text || text.length < 2) {
+        return { cleanedAnswer: '', isPureGreeting: true };
+    }
+    // Check if what remains is purely a greeting
+    if (isGreeting(text)) {
+        return { cleanedAnswer: '', isPureGreeting: true };
+    }
+    // Capitalize first letter of cleaned answer
+    const capitalized = text.charAt(0).toUpperCase() + text.slice(1);
+    return { cleanedAnswer: capitalized, isPureGreeting: false };
 }
 export function isUnknownAnswer(text) {
     const cleaned = cleanText(text);
@@ -202,7 +252,6 @@ export function findBestMatchingQuestion(interviewerQuestion, dataset, threshold
         let commonTitleTokens = 0;
         for (const t of qTokens) {
             if (inputTokens.includes(t)) {
-                // Boost distinctive words
                 commonTitleTokens += (t.length > 4 ? 1.5 : 1.0);
             }
         }
@@ -218,7 +267,6 @@ export function findBestMatchingQuestion(interviewerQuestion, dataset, threshold
             : 0;
         const keywordRatio = q.keywords.length > 0 ? Math.min(1.2, keywordHits / q.keywords.length) : 0;
         const cosineSim = calculateCosineSimilarity(inputTokens, qTokens);
-        // Balanced Composite Score: Jaccard of title (35%), keyword hits (35%), cosine (20%), raw hits (10%)
         const composite = (titleJaccard * 0.35) + (keywordRatio * 0.35) + (cosineSim * 0.20) + (Math.min(1, commonTitleTokens / 3) * 0.10);
         const confidence = Math.round(Math.min(100, composite * 130));
         if (confidence > highestConfidence) {

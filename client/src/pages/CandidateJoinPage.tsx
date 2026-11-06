@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, KeyRound, ArrowRight, AlertCircle, ArrowLeft, Shield } from 'lucide-react';
+import { getApiUrl } from '../utils/api.js';
 
 interface CandidateJoinPageProps {
   initialRoomId?: string;
@@ -37,7 +38,7 @@ export const CandidateJoinPage: React.FC<CandidateJoinPageProps> = ({
 
     try {
       // Validate with backend API before socket join
-      const res = await fetch(`/api/rooms/${cleanCode}?role=candidate`);
+      const res = await fetch(getApiUrl(`/api/rooms/${cleanCode}?role=candidate`));
       const data = await res.json();
 
       if (!res.ok || !data.success) {

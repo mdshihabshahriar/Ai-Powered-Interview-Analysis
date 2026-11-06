@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { evaluateWithNLP, isGreeting, isUnknownAnswer, findBestMatchingQuestion, } from './nlpEvaluator.js';
+import { evaluateWithNLP, isUnknownAnswer, filterGreetingsAndConversation, findBestMatchingQuestion, } from './nlpEvaluator.js';
 import { evaluateWithGemini } from './geminiEvaluator.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,19 +35,21 @@ export function matchQuestion(interviewerQuestion, threshold = 38) {
     return findBestMatchingQuestion(interviewerQuestion, allQuestions, threshold);
 }
 export async function evaluateAnswerForRecord(record, candidateAnswer) {
-    const trimmed = candidateAnswer.trim();
-    // 1. Filter ordinary greetings
-    if (isGreeting(trimmed)) {
+    const rawTrimmed = candidateAnswer.trim();
+    // 1. Filter ordinary greetings and conversational preamble
+    // E.g. "Hello, I am fine. JavaScript is a programming language..." -> "JavaScript is a programming language..."
+    const { cleanedAnswer, isPureGreeting } = filterGreetingsAndConversation(rawTrimmed);
+    if (isPureGreeting || !cleanedAnswer) {
         return {
             isGreeting: true,
         };
     }
-    // 2. Detect "I don't know" or unknown expressions
-    if (isUnknownAnswer(trimmed)) {
+    // 2. Detect "I don't know" or unknown expressions on the cleaned response
+    if (isUnknownAnswer(cleanedAnswer)) {
         return {
             isGreeting: false,
             evaluatedRecord: {
-                candidateAnswer: trimmed,
+                candidateAnswer: cleanedAnswer,
                 similarityScore: 0,
                 evaluationStatus: 'Not Answered',
                 aiFeedback: 'Candidate indicated they do not know the answer or passed on this question.',
@@ -58,17 +60,17 @@ export async function evaluateAnswerForRecord(record, candidateAnswer) {
             },
         };
     }
-    // 3. AI / NLP Semantic Evaluation against matched expected answer
+    // 3. AI / NLP Semantic Evaluation against matched expected answer using the cleaned answer
     const expectedAnswer = record.matchedExpectedAnswer || '';
     const keywords = record.matchedKeywords || [];
-    let evalResult = await evaluateWithGemini(record.matchedQuestion || record.interviewerQuestion, expectedAnswer, trimmed, keywords);
+    let evalResult = await evaluateWithGemini(record.matchedQuestion || record.interviewerQuestion, expectedAnswer, cleanedAnswer, keywords);
     if (!evalResult) {
-        evalResult = evaluateWithNLP(trimmed, expectedAnswer, keywords);
+        evalResult = evaluateWithNLP(cleanedAnswer, expectedAnswer, keywords);
     }
     return {
         isGreeting: false,
         evaluatedRecord: {
-            candidateAnswer: trimmed,
+            candidateAnswer: cleanedAnswer,
             similarityScore: evalResult.score,
             evaluationStatus: evalResult.status,
             aiFeedback: evalResult.feedback,

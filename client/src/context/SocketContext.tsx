@@ -28,8 +28,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       window.location.hostname === '127.0.0.1' ||
       window.location.hostname === '0.0.0.0';
 
+    const envBackendUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
     const backendPort = typeof __BACKEND_PORT__ !== 'undefined' ? __BACKEND_PORT__ : '5006';
-    const serverUrl = isLocalhost ? `http://localhost:${backendPort}` : window.location.origin;
+    const serverUrl = envBackendUrl
+      ? envBackendUrl
+      : isLocalhost
+      ? `http://localhost:${backendPort}`
+      : window.location.origin;
 
     console.log('[Socket] Connecting to server URL:', serverUrl);
 
