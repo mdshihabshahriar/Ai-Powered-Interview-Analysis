@@ -33,7 +33,13 @@ export function useWebRTC({
   roomId,
   role,
   remoteSocketId,
-  iceServers = [{ urls: 'stun:stun.l.google.com:19302' }],
+  iceServers = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+  ],
 }: UseWebRTCOptions) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -49,6 +55,7 @@ export function useWebRTC({
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const pendingCandidates = useRef<RTCIceCandidateInit[]>([]);
   const targetSocketIdRef = useRef<string | null>(remoteSocketId || null);
+  const iceRetryTimerRef = useRef<any>(null);
 
   const isAudioMutedRef = useRef<boolean>(false);
   const isVideoOffRef = useRef<boolean>(false);
@@ -205,7 +212,30 @@ export function useWebRTC({
       console.log('[WebRTC] ICE state:', pc.iceConnectionState);
       if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
         setConnectionState('connected');
-      } else if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+        // Clear any retry timer when connection succeeds
+        if (iceRetryTimerRef.current) {
+          clearTimeout(iceRetryTimerRef.current);
+          iceRetryTimerRef.current = null;
+        }
+      } else if (pc.iceConnectionState === 'failed') {
+        console.warn('[WebRTC] ICE failed — attempting ICE restart...');
+        setConnectionState('disconnected');
+        // ICE restart: re-initiate the call after a short delay
+        if (role === 'interviewer' && targetSocketIdRef.current && socket) {
+          if (iceRetryTimerRef.current) clearTimeout(iceRetryTimerRef.current);
+          iceRetryTimerRef.current = setTimeout(() => {
+            console.log('[WebRTC] Retrying call after ICE failure...');
+            // Close old connection
+            try { pc.close(); } catch (e) {}
+            pcRef.current = null;
+            pendingCandidates.current = [];
+            // Renegotiate with fresh PeerConnection
+            if (targetSocketIdRef.current) {
+              initiateCall(targetSocketIdRef.current);
+            }
+          }, 2000);
+        }
+      } else if (pc.iceConnectionState === 'disconnected') {
         setConnectionState('disconnected');
       }
     };

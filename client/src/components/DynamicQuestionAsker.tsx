@@ -37,6 +37,36 @@ const SAMPLE_PROMPTS = [
   "What is Database Indexing and how does it speed up queries?"
 ];
 
+// Remove acoustic repeat and duplicate words
+function deduplicateRepeatedWords(text: string): string {
+  if (!text) return '';
+  const words = text.trim().split(/\s+/);
+  const result: string[] = [];
+
+  for (let i = 0; i < words.length; i++) {
+    const current = words[i];
+    const prev = result[result.length - 1];
+
+    if (prev && current.toLowerCase() === prev.toLowerCase()) {
+      continue;
+    }
+
+    if (
+      result.length >= 2 &&
+      i + 1 < words.length &&
+      words[i].toLowerCase() === result[result.length - 2].toLowerCase() &&
+      words[i + 1].toLowerCase() === result[result.length - 1].toLowerCase()
+    ) {
+      i++;
+      continue;
+    }
+
+    result.push(current);
+  }
+
+  return result.join(' ');
+}
+
 export const DynamicQuestionAsker: React.FC<DynamicQuestionAskerProps> = ({
   activeAskedQuestion,
   onAskQuestion,
@@ -100,10 +130,15 @@ export const DynamicQuestionAsker: React.FC<DynamicQuestionAskerProps> = ({
           }
         }
 
-        setVoiceFinalText(accumulatedFinal.trim());
-        setVoiceInterimText(accumulatedInterim.trim());
+        const cleanFinal = deduplicateRepeatedWords(accumulatedFinal);
+        const cleanInterim = deduplicateRepeatedWords(accumulatedInterim);
 
-        const fullSpoken = (accumulatedFinal.trim() + (accumulatedInterim ? ' ' + accumulatedInterim.trim() : '')).trim();
+        setVoiceFinalText(cleanFinal);
+        setVoiceInterimText(cleanInterim);
+
+        const fullSpoken = deduplicateRepeatedWords(
+          (cleanFinal + (cleanInterim ? ' ' + cleanInterim : '')).trim()
+        );
 
         // Auto-detect when interviewer finishes speaking (1.8s pause)
         if (voiceSilenceTimerRef.current) clearTimeout(voiceSilenceTimerRef.current);

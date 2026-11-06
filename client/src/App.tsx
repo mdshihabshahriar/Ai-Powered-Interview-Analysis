@@ -56,8 +56,16 @@ export function App() {
   const [startTime, setStartTime] = useState<string | null>(null);
   const [endedAt, setEndedAt] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState<boolean>(false);
+  // Default ICE servers: multiple STUN + public TURN relays so cross-network calls work
   const [iceServers, setIceServers] = useState<RTCIceServer[]>([
     { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    // Open Relay Project — free public TURN for internet NAT traversal
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
   ]);
 
   // WebRTC Hook

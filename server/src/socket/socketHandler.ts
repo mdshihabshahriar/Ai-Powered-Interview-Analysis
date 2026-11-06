@@ -18,7 +18,28 @@ export function setupSocketHandlers(io: Server) {
       socket.join(cleanRoomId);
 
       const iceServers = [
-        ...config.stunServers.map(url => ({ urls: url })),
+        // Multiple STUN servers for better NAT traversal discovery
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        // Free public TURN relay servers (Open Relay Project) — works across different networks
+        {
+          urls: 'turn:openrelay.metered.ca:80',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:openrelay.metered.ca:443',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        // Custom TURN server if configured via environment variable
         ...(config.turnServerUrl
           ? [
               {
