@@ -1,0 +1,16 @@
+{
+  "name": "ai-interview-system",
+  "version": "1.0.0",
+  "description": "AI-Powered Real-Time Online Interview & Answer Evaluation System",
+  "scripts": {
+    "clean:ports": "lsof -ti:5001,5006,5173,5174 | xargs kill -9 2>/dev/null || true",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "cd server && npm run build && cd ../client && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,143 @@
+[
+  {
+    "id": 1,
+    "category": "JavaScript",
+    "question": "What is JavaScript?",
+    "expectedAnswer": "JavaScript is a high-level, dynamic, single-threaded programming language primarily used to make web pages interactive. It supports event-driven, functional, and object-oriented programming paradigms, running in web browsers and server-side environments like Node.js.",
+    "keywords": ["programming language", "interactive", "dynamic", "single-threaded", "browsers", "Node.js", "event-driven"]
+  },
+  {
+    "id": 2,
+    "category": "JavaScript",
+    "question": "What is the difference between var, let, and const?",
+    "expectedAnswer": "var is function-scoped and hoisted with undefined, allowing re-declaration. let and const are block-scoped and hoisted in a temporal dead zone. let allows value reassignment, whereas const must be initialized at declaration and cannot be reassigned.",
+    "keywords": ["var", "let", "const", "function scope", "block scope", "reassignment", "temporal dead zone", "hoisting"]
+  },
+  {
+    "id": 3,
+    "category": "JavaScript",
+    "question": "Explain closures in JavaScript and give a practical use case.",
+    "expectedAnswer": "A closure is a function that retains access to its lexical outer scope even after the outer function has finished executing. Practical use cases include data privacy or encapsulation, function currying, and memoization.",
+    "keywords": ["closure", "lexical scope", "outer function", "data privacy", "encapsulation", "inner function", "retains access"]
+  },
+  {
+    "id": 4,
+    "category": "JavaScript",
+    "question": "How does the JavaScript Event Loop work?",
+    "expectedAnswer": "JavaScript is single-threaded. The event loop continuously monitors the call stack and callback task queues. When the call stack is empty, it pushes tasks from the microtask queue like Promises first, followed by macrotasks like setTimeout, allowing non-blocking asynchronous execution.",
+    "keywords": ["event loop", "single-threaded", "call stack", "microtask", "macrotask", "callback queue", "Promises", "non-blocking"]
+  },
+  {
+    "id": 5,
+    "category": "JavaScript",
+    "question": "What is the difference between synchronous code, Promises, and async/await?",
+    "expectedAnswer": "Synchronous code executes sequentially and blocks execution until completion. Promises represent asynchronous operations that eventually resolve with a value or reject with an error. async/await is syntactic sugar over Promises that allows writing asynchronous code in a readable, sequential manner with try/catch error handling.",
+    "keywords": ["synchronous", "Promises", "async await", "asynchronous", "resolve", "reject", "syntactic sugar", "try catch"]
+  },
+  {
+    "id": 6,
+    "category": "React",
+    "question": "What is React and how does the Virtual DOM work?",
+    "expectedAnswer": "React is a JavaScript component-based library for building user interfaces. The Virtual DOM is a lightweight in-memory representation of the real DOM. When state changes, React creates a new virtual DOM tree, diffs it against the previous one using reconciliation, and computes minimal real DOM updates.",
+    "keywords": ["React", "Virtual DOM", "reconciliation", "diffing", "components", "DOM updates", "state changes"]
+  },
+  {
+    "id": 7,
+    "category": "React",
+    "question": "What is the difference between State and Props in React?",
+    "expectedAnswer": "Props are read-only configuration inputs passed from parent to child components to configure them. State is mutable data managed locally within a component that can change over time through user interactions or events, triggering re-renders when updated.",
+    "keywords": ["props", "state", "read-only", "parent to child", "mutable", "re-render", "component"]
+  },
+  {
+    "id": 8,
+    "category": "React",
+    "question": "How does the useEffect hook work and how do you handle cleanup?",
+    "expectedAnswer": "useEffect executes side effects such as data fetching, subscriptions, or manual DOM manipulations after rendering. Its dependency array controls when it re-runs. To handle cleanup, the effect function can return a cleanup function that runs before the component unmounts or before the effect re-runs.",
+    "keywords": ["useEffect", "side effects", "dependency array", "cleanup function", "unmount", "re-render"]
+  },
+  {
+    "id": 9,
+    "category": "React",
+    "question": "What are React Hooks and why were they introduced?",
+    "expectedAnswer": "React Hooks are functions like useState, useEffect, and useContext that allow developers to use state and lifecycle features inside functional components without writing class components. They promote cleaner code, easier state logic reuse, and avoid complex 'this' binding.",
+    "keywords": ["hooks", "useState", "functional components", "lifecycle", "code reuse", "class components"]
+  },
+  {
+    "id": 10,
+    "category": "Node.js",
+    "question": "What makes Node.js non-blocking and single-threaded?",
+    "expectedAnswer": "Node.js uses Google V8 engine and libuv for an event-driven, non-blocking I/O model. While JavaScript runs on a single main thread, libuv delegates asynchronous I/O operations such as file system, network requests, and DNS lookups to a background thread pool, notifying the event loop upon completion.",
+    "keywords": ["Node.js", "non-blocking", "single-threaded", "libuv", "V8", "event loop", "thread pool", "asynchronous I/O"]
+  },
+  {
+    "id": 11,
+    "category": "Node.js",
+    "question": "What are Streams in Node.js and why are they useful?",
+    "expectedAnswer": "Streams are collections of data that might not be available all at once and don't need to fit entirely into memory. They allow reading or writing data chunk-by-chunk, making them memory-efficient and fast for processing large files or handling network payloads.",
+    "keywords": ["streams", "chunks", "memory efficient", "large files", "readable", "writable", "backpressure"]
+  },
+  {
+    "id": 12,
+    "category": "Node.js",
+    "question": "What is Express middleware and how does the next() function work?",
+    "expectedAnswer": "Middleware functions in Express have access to the request object, response object, and the next middleware function in the application's request-response cycle. Calling next() passes execution control to the subsequent middleware function, while omitting it will terminate or hang the request.",
+    "keywords": ["middleware", "Express", "request", "response", "next", "pipeline", "request-response cycle"]
+  },
+  {
+    "id": 13,
+    "category": "Web Architecture",
+    "question": "What is CORS (Cross-Origin Resource Sharing) and why does it occur?",
+    "expectedAnswer": "CORS is a browser security mechanism that restricts web applications from making HTTP requests to a different domain, protocol, or port than the one serving the application. The server must send appropriate headers such as Access-Control-Allow-Origin to explicitly authorize cross-origin requests.",
+    "keywords": ["CORS", "browser security", "cross-origin", "domain", "protocol", "port", "Access-Control-Allow-Origin", "headers"]
+  },
+  {
+    "id": 14,
+    "category": "Web Architecture",
+    "question": "What is the difference between REST APIs and GraphQL?",
+    "expectedAnswer": "REST uses fixed endpoints with standard HTTP verbs returning predetermined data shapes, which can lead to over-fetching or under-fetching. GraphQL provides a single endpoint where clients query for exactly the data fields they need using a strongly-typed schema.",
+    "keywords": ["REST", "GraphQL", "endpoints", "over-fetching", "under-fetching", "schema", "HTTP methods", "queries"]
+  },
+  {
+    "id": 15,
+    "category": "Web Architecture",
+    "question": "How does WebRTC achieve real-time peer-to-peer communication?",
+    "expectedAnswer": "WebRTC enables real-time peer-to-peer audio, video, and data communication directly between browsers. It uses a signaling server for SDP offer-answer exchange and candidate discovery, then uses STUN and TURN ICE servers for NAT traversal to establish direct encrypted media streams.",
+    "keywords": ["WebRTC", "peer-to-peer", "signaling", "SDP", "STUN", "TURN", "ICE candidates", "NAT traversal", "encryption"]
+  },
+  {
+    "id": 16,
+    "category": "Database & SQL",
+    "question": "What are ACID properties in database transactions?",
+    "expectedAnswer": "ACID stands for Atomicity, Consistency, Isolation, and Durability. Atomicity ensures all operations succeed or none do. Consistency ensures data adheres to validity rules. Isolation prevents concurrent transactions from interfering with each other. Durability guarantees committed transactions survive system crashes.",
+    "keywords": ["ACID", "Atomicity", "Consistency", "Isolation", "Durability", "transaction", "rollback", "commit"]
+  },
+  {
+    "id": 17,
+    "category": "Database & SQL",
+    "question": "What is the difference between SQL and NoSQL databases?",
+    "expectedAnswer": "SQL databases are relational, table-based, have strict predefined schemas, and support ACID transactions, scaling vertically. NoSQL databases are non-relational, document, key-value, or graph-based, offer flexible or dynamic schemas, and excel at horizontal scaling for unstructured or high-velocity data.",
+    "keywords": ["SQL", "NoSQL", "relational", "document", "schema", "horizontal scaling", "vertical scaling", "ACID"]
+  },
+  {
+    "id": 18,
+    "category": "Database & SQL",
+    "question": "What is Database Indexing and how does it improve query performance?",
+    "expectedAnswer": "A database index is a data structure, typically a B-Tree or Hash table, that provides fast pointers to rows based on indexed column values. It avoids costly full-table scans, drastically speeding up SELECT queries at the cost of slightly slower write operations and extra disk storage.",
+    "keywords": ["indexing", "B-Tree", "full-table scan", "query performance", "pointers", "SELECT", "write overhead"]
+  },
+  {
+    "id": 19,
+    "category": "System Design",
+    "question": "What is the difference between Horizontal and Vertical scaling?",
+    "expectedAnswer": "Vertical scaling, or scaling up, involves adding more computing power such as CPU, RAM, or storage to an existing server, which has hardware physical limits. Horizontal scaling, or scaling out, adds more server instances to distribute traffic via a load balancer, offering higher fault tolerance and elasticity.",
+    "keywords": ["horizontal scaling", "vertical scaling", "scale up", "scale out", "CPU", "RAM", "load balancer", "fault tolerance"]
+  },
+  {
+    "id": 20,
+    "category": "System Design",
+    "question": "What is caching and how do Redis or CDN caches improve latency?",
+    "expectedAnswer": "Caching is the practice of storing frequently accessed data in high-speed storage so future requests are served faster. In-memory caches like Redis store database results or session data in RAM, while CDNs cache static assets closer to end-users geographically, drastically reducing backend load and latency.",
+    "keywords": ["caching", "Redis", "CDN", "in-memory", "latency", "RAM", "static assets", "backend load"]
+  }
+]
+
