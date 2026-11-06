@@ -4,3 +4,4 @@ export function getApiUrl(path: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return BACKEND_URL ? `${BACKEND_URL}${normalizedPath}` : normalizedPath;
 }
+
